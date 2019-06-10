@@ -18,7 +18,7 @@ var colorArray = [
     '#FF7E14',
     '#FFEB14',
     '#58E912',
-]
+];
 
 window.addEventListener('resize', function(){
     canvas.width = window.innerWidth;
@@ -32,57 +32,62 @@ window.addEventListener('mousemove', function(event){
     mouse.y = event.y;
 });
 
-function Object(x,y,dx,dy,rad){
+function randomColor(color){
+    return color[Math.floor(Math.random() * color.length )];
+}
+
+function randomIntFromRange(min, max){
+    return Math.floor(Math.random() * (max - min + 1) + min); 
+}
+
+function Object(x,y,rad,color){
     this.x = x;
     this.y = y;
-    this.dx = dx;
-    this.dy = dy;
     this.rad = rad;
-    this.color = Math.floor(Math.random() * colorArray.length);
+    this.color = color;
+    this.radians = Math.random() * Math.PI * 2;
+    this.velocity = 0.05;
+    this.distanceFromCenter = randomIntFromRange(70, 150)
 
     this.draw = function(){
         ctx.beginPath();
         ctx.arc(this.x,this.y, this.rad, 0,Math.PI * 2, false);
-        ctx.fillStyle = colorArray[this.color];
+        ctx.fillStyle = this.color;
         ctx.fill();
-        // Update the Movement
-        this.update();
+
     }
 
     this.update = function(){
-        if(this.x + this.rad > innerWidth || this.x - this.rad < 0){
-            this.dx = -this.dx;
-        }
-        if(this.y + this.rad > innerHeight || this.y - this.rad < 0){
-            this.dy = -this.dy;
-        }
+        //Draw the object
 
-        this.x+=this.dx;
-        this.y+=this.dy;
+        this.draw();
+        this.radians += this.velocity;
+        this.x = x + Math.cos(this.radians) * this.distanceFromCenter;
+        this.y = y + Math.sin(this.radians) * this.distanceFromCenter;
+
     }
 }
 
 // console.log('Draw');
 
 
-// var ObjectArray = [];
+var ObjectArray = [];
 
-// function init(){
-//Creating numbers of Objects
-// for(var i = 0; i < 100 ; i++){
-//     var x = 100;
-//     var y = 100;
-//     var  dx = 5;
-//     var dy = 5;
-//     var rad = 50;
+function init(){
+// Creating numbers of Objects
+for(var i = 0; i < 100 ; i++){
+    var x = 100;
+    var y = 100;
+    var rad = 5;
+    var color = randomColor(colorArray);
 
-//     ObjectArray.push(new Object(x,y,dx,dy,rad));
-// }
-// }
+    ObjectArray.push(new Object(canvas.width / 2, canvas.height / 2,rad,color));
+}
+}
 
-// init();
+init();
 
-var obj1 = new Object(100,100,5,5,30);
+// var obj1 = new Object(100,100,5,5,30);
 
 
 
@@ -90,11 +95,11 @@ function animate(){
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
 
-    obj1.draw();
+    // obj1.draw();
 
-    // for(var i = 0; i<ObjectArray.length; i++){
-    //     ObjectArray[i].draw();
-    // }
+    ObjectArray.forEach(object => {
+        object.update();
+    });
 
 }
 
